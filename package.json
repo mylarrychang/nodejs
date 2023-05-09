@@ -1,0 +1,11 @@
+{
+    "name": "demo",
+    "version": "1.0.0",
+    "main": "socket.mjs",
+    "scripts": {
+        "demo": "node socket.mjs"
+    },
+    "dependencies": {
+        "websocket": "^1.0.34"
+    }
+}
