@@ -10,15 +10,8 @@ const websocket = new WebSocketServer({
 })
 const sockets = []
 
-const subsriber = redis.createClient({
-    port: 6379,
-    host: 'localhost'
-})
-
-const publisher = redis.createClient({
-    port: 6379,
-    host: 'localhost'
-})
+const subsriber = redis.createClient('redis://redis:6379')
+const publisher = redis.createClient('redis://redis:6379')
 
 subsriber.on("message", function(channel, message) {
     console.log(`received: ${message}`)
