@@ -6,6 +6,7 @@
         "demo": "node socket.mjs"
     },
     "dependencies": {
+        "redis": "^3.0.2",
         "websocket": "^1.0.34"
     }
 }
