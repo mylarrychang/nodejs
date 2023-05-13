@@ -1,0 +1,25 @@
+<%- include('common/head.ejs') %>
+
+<body>
+  <div class="jumbotron">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Time</th>
+          <th scope="col">Name</th>
+          <th scope="col">Author</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% var movieList=JSON.parse(movies); %>
+        <% for (var i=0; i < movieList.length ; i++) { %>
+        <tr>
+          <td><%= movieList[i].time %></td>
+          <td><%= movieList[i].name %></td>
+          <td><%= movieList[i].author %></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>

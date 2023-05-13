@@ -1,12 +1,15 @@
 {
     "name": "demo",
     "version": "1.0.0",
-    "main": "socket.mjs",
+    "main": "http.mjs",
     "scripts": {
-        "demo": "node socket.mjs"
+        "demo": "node http.mjs"
     },
     "dependencies": {
+        "ejs": "^3.1.9",
+        "express": "^4.18.2",
         "ioredis": "^4.11.2",
+        "mongodb": "^5.5.0",
         "redis": "^3.0.2",
         "websocket": "^1.0.34"
     }

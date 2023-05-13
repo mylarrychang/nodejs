@@ -1,11 +1,16 @@
-version : '3'
-
+version: "3.5"
 services :
+  rds:
+    image: "redis"
+    networks:
+      - local-dev
   web1:
-      image: demo
-      ports:
-        - 8080:8080
-  redis:
-    image: "redis:7.0.11"
+    image: demo
     ports:
-      - 6379:6379
+      - 8080:8080
+    networks:
+      - local-dev
+
+networks:
+  local-dev:
+    external: true
