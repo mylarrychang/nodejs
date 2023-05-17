@@ -17,7 +17,7 @@ var counter = 0
  * 2. For list/ API, list all of the movies under a author.
  */
 async function main() {
-    const uri = "mongodb://localhost:27017"
+    const uri = "mongodb://mongo:27017"
     const client = new mongodb.MongoClient(uri)
     client.connect()
     console.log("in db connection...")
