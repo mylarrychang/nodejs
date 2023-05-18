@@ -32,8 +32,21 @@ async function main() {
     app.set('view engine', 'ejs');
     app.set('views', __dirname);
 
+    app.get('/list', async function (req, res) {
+        console.log("in lists request... ID: " + ID)
+        var movies = []
+        const query = {}
+        const array = collection.find(query)
+        for await (const doc of array) {
+            // list of documents
+            console.log(doc)
+            movies.push({ time: doc.time, name: doc.name, author: doc.author })
+        }
+        res.render(path.resolve("html/list"), { movies: JSON.stringify(movies) })
+    })
+
     app.get('/list/:author', async function (req, res) {
-        console.log("in list request... ID: " + ID)
+        console.log("in list request - ... ID: " + ID)
         var movies = []
         const query = { author: req.params.author }
         const array = collection.find(query)
