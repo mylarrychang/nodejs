@@ -3,6 +3,12 @@ import mongodb from 'mongodb'
 import express from 'express'
 import bodyParser from 'body-parser'
 import path from 'path'
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const mongo_server = typeof process.env.mongo_server == 'undefined' ? "localhost" : process.env.mongo_server
 
 const app = express()
 const port = 8080
@@ -17,12 +23,13 @@ var counter = 0
  * 2. For list/ API, list all of the movies under a author.
  */
 async function main() {
-    const uri = "mongodb://mongo:27017"
+    const uri = "mongodb://" + mongo_server + ":27017"
     const client = new mongodb.MongoClient(uri)
     client.connect()
-    console.log("in db connection...")
+    console.log("in db connection..." + uri)
     const collection = client.db('mydatabase').collection('movies');
     app.set('view engine', 'ejs');
+    app.set('views', __dirname);
 
     app.get('/list/:author', async function (req, res) {
         console.log("in list request..." + req.params.author)
@@ -37,7 +44,6 @@ async function main() {
         res.render(path.resolve("html/list"), { movies: JSON.stringify(movies) })
     })
 
-    // This is anti-pattern....
     app.get('/insert', async function (req, res) {
         console.log("in insert get request...")
         res.render(path.resolve("html/insert"), { result: "" })

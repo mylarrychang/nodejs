@@ -1,0 +1,1 @@
+sudo docker build -t httpdemo . && sudo docker-compose up

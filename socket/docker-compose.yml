@@ -2,15 +2,7 @@ version: "3.5"
 services :
   rds:
     image: "redis"
-    networks:
-      - local-dev
   web1:
     image: demo
     ports:
       - 8080:8080
-    networks:
-      - local-dev
-
-networks:
-  local-dev:
-    external: true

@@ -1,8 +1,29 @@
-version: "3.5"
+version: "3"
 services :
-  mongo:
-    image: "mongo"
   web1:
-    image: demo
+    image: httpdemo
     ports:
       - 8080:8080
+    environment:
+      - mongo_server=mongo
+    depends_on:
+      - mongo
+    networks:
+      - node_network
+    links:
+      - mongo
+  mongo:
+    image: "mongo"
+    container_name: "mongo"
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - node_network
+    expose:
+      - 27017
+volumes:
+  dbdata:
+
+networks:
+  node_network:
+    driver: bridge

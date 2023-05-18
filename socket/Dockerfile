@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:16
 WORKDIR /home/node/web
 COPY package.json /home/node/web
 COPY package-lock.json /home/node/web
