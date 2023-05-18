@@ -1,8 +1,28 @@
 version: "3.5"
 services :
-  rds:
-    image: "redis"
-  web1:
-    image: demo
+  proxy:
+    image: "haproxy"
     ports:
       - 8080:8080
+    volumes:
+      - ./haproxy:/usr/local/etc/haproxy
+  rds:
+    image: "redis"
+  ws1:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - ID=1
+  ws2:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - ID=2 
+  ws3:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      - ID=3

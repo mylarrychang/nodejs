@@ -1,0 +1,97 @@
+
+version: "3.5"
+services :
+  # API Proxy
+  proxy:
+    image: "haproxy"
+    ports:
+      - 8080:8080
+      - 8081:8081
+    volumes:
+      - ./haproxy:/usr/local/etc/haproxy
+    depends_on:
+      - ws1
+      - ws2
+      - ws3
+      - http1
+      - http2
+    networks:
+      - node_network
+
+  # Used for pub-sub
+  rds:
+    image: "redis"
+    networks:
+      - node_network
+
+  # WebSockets server
+  ws1:
+    build:
+      context: ./socket
+      dockerfile: Dockerfile
+    environment:
+      - ID=1
+    networks:
+      - node_network
+  ws2:
+    build:
+      context: ./socket
+      dockerfile: Dockerfile
+    environment:
+      - ID=2 
+    networks:
+      - node_network
+  ws3:
+    build:
+      context: ./socket
+      dockerfile: Dockerfile
+    environment:
+      - ID=3
+    networks:
+      - node_network
+
+  # Document db to store messages
+  mongo:
+    image: "mongo"
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - node_network
+    expose:
+      - 27017
+
+  # Http clients.
+  http1:
+    build:
+      context: ./http
+      dockerfile: Dockerfile
+    environment:
+      - mongo_server=mongo
+      - ID=1
+    depends_on:
+      - mongo
+    networks:
+      - node_network
+    links:
+      - mongo
+
+  http2:
+    build:
+      context: ./http
+      dockerfile: Dockerfile
+    environment:
+      - mongo_server=mongo
+      - ID=2
+    depends_on:
+      - mongo
+    networks:
+      - node_network
+    links:
+      - mongo
+
+volumes:
+  dbdata:
+
+networks:
+  node_network:
+    driver: bridge

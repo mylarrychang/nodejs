@@ -9,6 +9,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const mongo_server = typeof process.env.mongo_server == 'undefined' ? "localhost" : process.env.mongo_server
+const ID = process.env.ID
 
 const app = express()
 const port = 8080
@@ -32,7 +33,7 @@ async function main() {
     app.set('views', __dirname);
 
     app.get('/list/:author', async function (req, res) {
-        console.log("in list request..." + req.params.author)
+        console.log("in list request... ID: " + ID)
         var movies = []
         const query = { author: req.params.author }
         const array = collection.find(query)
@@ -45,12 +46,12 @@ async function main() {
     })
 
     app.get('/insert', async function (req, res) {
-        console.log("in insert get request...")
+        console.log("in insert get request... ID: " +  ID)
         res.render(path.resolve("html/insert"), { result: "" })
     })
 
     app.post('/insert', async function (req, res) {
-        console.log("in insert post request...")
+        console.log("in insert post request... ID: " + ID)
         let date = new Date().toJSON();
         const { name, author } = req.body
         const query = { time: date, name: name, author: author }

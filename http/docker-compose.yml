@@ -1,7 +1,18 @@
 version: "3"
 services :
-  web1:
-    image: httpdemo
+  mongo:
+    image: "mongo"
+    container_name: "mongo"
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - node_network
+    expose:
+      - 27017
+  http1:
+    build:
+      context: ./
+      dockerfile: Dockerfile
     ports:
       - 8080:8080
     environment:
@@ -12,15 +23,6 @@ services :
       - node_network
     links:
       - mongo
-  mongo:
-    image: "mongo"
-    container_name: "mongo"
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - node_network
-    expose:
-      - 27017
 volumes:
   dbdata:
 
