@@ -31,6 +31,19 @@ async function main() {
     const collection = client.db('mydatabase').collection('movies');
     app.set('view engine', 'ejs');
     app.set('views', __dirname);
+    app.use(express.static(__dirname + "/html"))
+
+    var user_id = 0
+    app.get('/chat', async function (req, res) {
+        console.log("in get ... ID: " + ID)
+        var num = user_id % 5 + 1
+        var self_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + num + "-bg.webp"
+        res.render(path.resolve("html/chat"), {
+            self_image_url: self_image_url,
+            image_num: num,
+            user_id: user_id++
+        })
+    })
 
     app.get('/list', async function (req, res) {
         console.log("in lists request... ID: " + ID)
@@ -59,7 +72,7 @@ async function main() {
     })
 
     app.get('/insert', async function (req, res) {
-        console.log("in insert get request... ID: " +  ID)
+        console.log("in insert get request... ID: " + ID)
         res.render(path.resolve("html/insert"), { result: "" })
     })
 

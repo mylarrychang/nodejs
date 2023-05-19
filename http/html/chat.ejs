@@ -1,0 +1,138 @@
+<%- include('common/head.ejs') %>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<script>
+  var ws = new WebSocket("ws://192.168.1.146:8081")
+  var user_id = "<%= user_id %>"
+  var image_num = "<%= image_num %>"
+  var image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + image_num + "-bg.webp"
+
+  window.onload = function() {
+    document.getElementById("sendmessage").onclick = dosend
+    // const scrollingElement = (document.getElementById('chat_window'));
+
+    function dosend() {
+      sendMsg(document.getElementById('msg').value)
+      document.getElementById('msg').value = ""
+
+      /*
+      $(scrollingElement).animate({
+        scrollTop: document.getElementById('chat_window').scrollHeight,
+      }, 500);
+      */
+    }
+
+    document.getElementById("msg").addEventListener("keyup",
+      function(event) {
+        if (!event) {
+          var event = window.event;
+        }
+        event.preventDefault();
+        if (event.keyCode == 13) {
+          dosend()
+        }
+      }, false);
+
+    ws.onmessage = message => {
+      console.log(`received: ${message.data}`)
+      var data = message.data
+      var from_user_id = data.substring(0, data.indexOf(':'))
+      // split to next one
+      data = data.substring(data.indexOf(':') + 1)
+      var from_image_num = data.substring(0, data.indexOf(':'))
+      var from_msg = data.substring(data.indexOf(':' + 1))
+      var from_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + from_image_num + "-bg.webp"
+
+      var parent = document.getElementById('chat_window')
+      var child = document.createElement('div')
+      if (from_user_id == user_id) {
+        child.innerHTML = `
+              <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                <div>
+                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">${from_msg}</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
+                </div>
+                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
+              </div>`
+
+      } else {
+        child.innerHTML = `
+              <div class="d-flex flex-row justify-content-start">
+                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
+                <div>
+                  <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">${from_msg}</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
+                </div>
+              </div>`
+      }
+      parent.appendChild(child)
+      $(parent).animate({
+        scrollTop: parent.scrollHeight,
+      }, 500);
+    }
+
+    function sendMsg(msg) {
+      if (!msg) return
+      try {
+        ws.send(`${user_id}:${image_num}:${msg}`)
+      } catch (e) {
+        console.log("reconnecting.. ")
+        setTimeout(() => {}, 5000)
+        ws = new WebSocket("ws://192.168.1.146:8081")
+        sendMsg(msg)
+      }
+    }
+
+  };
+</script>
+
+<body>
+  <section style="background-color: #eee;">
+    <div class="container py-5">
+
+      <div class="row d-flex justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-6">
+
+          <div class="card" id="chat2">
+            <div class="card-header d-flex justify-content-between align-items-center p-3">
+              <h5 class="mb-0">Chat Room</h5>
+            </div>
+            <div id="chat_window" class="card-body overflow-auto scrollbar-cyan bordered-cyan" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
+
+              <!--
+              <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                <div>
+                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Hiii, I'm good.</p>
+                </div>
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
+              </div>
+
+              <div class="d-flex flex-row justify-content-start mb-4">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
+                <div>
+                  <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Okay</p>
+                  <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">We will go on
+                    Sunday?</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted">00:07</p>
+                </div>
+              </div>
+              -->
+
+            </div>
+            <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+              <img src="<%= self_image_url %>" alt="avatar 3" style="width: 40px; height: 100%;">
+              <input type="text" class="form-control form-control-lg" id="msg" placeholder="Type message">
+              <a class="ms-1 text-muted" href="#!"><i class="fas fa-paperclip"></i></a>
+              <a class="ms-3 text-muted" href="#!"><i class="fas fa-smile"></i></a>
+              <!-- 
+                <a class="ms-3" id="sendmessage" href="#!" onclick="sendMsg(document.getElementById('msg').value)"><i class="fas fa-paper-plane"></i></a>
+              -->
+              <a class="ms-3" id="sendmessage" href="#!"><i class="fas fa-paper-plane"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>

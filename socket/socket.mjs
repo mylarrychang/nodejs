@@ -52,6 +52,6 @@ websocket.on("request", request => {
         }
     })
 
-    setTimeout(() => con.send('connected successfully.'), 50000)
+    setTimeout(() => {}, 50000)
     sockets.push(con)
 })
