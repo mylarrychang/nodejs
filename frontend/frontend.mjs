@@ -34,7 +34,7 @@ async function main() {
     app.use(express.static(__dirname + "/html"))
 
     var user_id = 0
-    app.get('/chat', async function (req, res) {
+    app.get('/', async function (req, res) {
         console.log("in get ... ID: " + ID)
         var num = user_id % 5 + 1
         var self_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + num + "-bg.webp"

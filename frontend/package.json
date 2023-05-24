@@ -1,9 +1,9 @@
 {
-    "name": "demo",
+    "name": "frontend",
     "version": "1.0.0",
-    "main": "http.mjs",
+    "main": "frontend.mjs",
     "scripts": {
-        "demo": "node http.mjs"
+        "frontend": "node frontend.mjs"
     },
     "dependencies": {
         "ejs": "^3.1.9",

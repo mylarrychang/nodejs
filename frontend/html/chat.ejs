@@ -1,0 +1,129 @@
+<%- include('common/head.ejs') %>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<script>
+  // connect to socket server.
+  var user_id = "<%= user_id %>"
+  var image_num = "<%= image_num %>"
+  var image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + image_num + "-bg.webp"
+
+  window.onload = function() {
+    function connect() {
+      var ws = new WebSocket("ws://192.168.1.146:8081")
+
+      ws.onclose = function(e) {
+        console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+        setTimeout(function() {
+          connect();
+        }, 1000);
+      };
+
+      ws.onerror = function(err) {
+        console.error('Socket encountered error: ', err.message, 'Closing socket');
+        ws.close();
+      };
+
+      // Events when received message from socket.
+      ws.onmessage = message => {
+        console.log(`received: ${message.data}`)
+        var data = message.data
+        var from_user_id = data.substring(0, data.indexOf(':'))
+        // split to next one
+        data = data.substring(data.indexOf(':') + 1)
+        var from_image_num = data.substring(0, data.indexOf(':'))
+        var from_msg = data.substring(data.indexOf(':' + 1))
+        var from_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + from_image_num + "-bg.webp"
+
+        // Append the chat message into chat window.
+        var parent = document.getElementById('chat_window')
+        var child = document.createElement('div')
+        if (from_user_id == user_id) {
+          child.innerHTML = `
+              <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                <div>
+                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">${from_msg}</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
+                </div>
+                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
+              </div>`
+
+        } else {
+          child.innerHTML = `
+              <div class="d-flex flex-row justify-content-start">
+                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
+                <div>
+                  <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">${from_msg}</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
+                </div>
+              </div>`
+        }
+        parent.appendChild(child)
+
+        // Scroll down to the bottom to show the latest message on both sides.
+        $(parent).animate({
+          scrollTop: parent.scrollHeight,
+        }, 500);
+      }
+
+      // send message event
+      document.getElementById("sendmessage").onclick = dosend
+
+      function dosend() {
+        sendMsg(document.getElementById('msg').value)
+        document.getElementById('msg').value = ""
+      }
+
+      // send message when click `enter` key
+      document.getElementById("msg").addEventListener("keyup",
+        function(event) {
+          if (!event) {
+            var event = window.event;
+          }
+          event.preventDefault();
+          if (event.keyCode == 13) {
+            dosend()
+          }
+        }, false);
+
+      function sendMsg(msg) {
+        if (!msg) return
+        try {
+          ws.send(`${user_id}:${image_num}:${msg}`)
+        } catch (e) {
+          console.log("error.. " + e)
+        }
+      }
+    }
+
+    connect()
+
+  };
+</script>
+
+<body>
+  <section style="background-color: #eee;">
+    <div class="container py-5">
+
+      <div class="row d-flex justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-6">
+
+          <div class="card" id="chat2">
+            <div class="card-header d-flex justify-content-between align-items-center p-3">
+              <h5 class="mb-0">Chat Room</h5>
+            </div>
+            <div id="chat_window" class="card-body overflow-auto" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
+            </div>
+            <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+              <img src="<%= self_image_url %>" alt="avatar 3" style="width: 40px; height: 100%;">
+              <input type="text" class="form-control form-control-lg" id="msg" placeholder="Type message">
+              <a class="ms-1 text-muted" href="#!"><i class="fas fa-paperclip"></i></a>
+              <a class="ms-3 text-muted" href="#!"><i class="fas fa-smile"></i></a>
+              <a class="ms-3" id="sendmessage" href="#!"><i class="fas fa-paper-plane"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>

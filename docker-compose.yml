@@ -13,8 +13,8 @@ services :
       - ws1
       - ws2
       - ws3
-      - http1
-      - http2
+      - frontend1
+      - frontend2
     networks:
       - node_network
 
@@ -61,9 +61,9 @@ services :
       - 27017
 
   # Http clients.
-  http1:
+  frontend1:
     build:
-      context: ./http
+      context: ./frontend
       dockerfile: Dockerfile
     environment:
       - mongo_server=mongo
@@ -75,9 +75,9 @@ services :
     links:
       - mongo
 
-  http2:
+  frontend2:
     build:
-      context: ./http
+      context: ./frontend
       dockerfile: Dockerfile
     environment:
       - mongo_server=mongo
