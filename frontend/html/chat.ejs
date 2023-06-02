@@ -3,12 +3,68 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
 <script>
+  function b64DecodeUnicode(str) {
+    // Going backwards: from bytestream, to percent-encoding, to original string.
+    return decodeURIComponent(atob(str).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+
   // connect to socket server.
   var user_id = "<%= user_id %>"
   var image_num = "<%= image_num %>"
   var image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + image_num + "-bg.webp"
+  var msg = "<%- messages %>"
+  const decoded_msg = b64DecodeUnicode(msg)
+  var messageList = JSON.parse(decoded_msg)
 
   window.onload = function() {
+    var chat_window = document.getElementById('chat_window')
+
+    function appendMessageToChatWindow(from_user_id, from_image_url, from_msg) {
+      console.log("from_user_id: " + from_user_id)
+      // Append the chat message into chat window.
+      var parent = document.getElementById('chat_window')
+      var child = document.createElement('div')
+      if (from_user_id == user_id) {
+        child.innerHTML = `
+              <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                <div>
+                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">${from_msg}</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
+                </div>
+                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
+              </div>`
+
+      } else {
+        child.innerHTML = `
+              <div class="d-flex flex-row justify-content-start">
+                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
+                <div>
+                  <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">${from_msg}</p>
+                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
+                </div>
+              </div>`
+      }
+      parent.appendChild(child)
+    }
+
+    // load history messages
+    for (var i = messageList.length - 1; i >= 0; i--) {
+      var index = messageList[i].author_id % 5 + 1
+      var img_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + index + "-bg.webp"
+      appendMessageToChatWindow(
+        messageList[i].author_id,
+        img_url,
+        messageList[i].message
+      )
+    }
+
+    // Scroll down to the bottom to show the latest message on both sides.
+    $(chat_window).animate({
+      scrollTop: chat_window.scrollHeight,
+    }, 500);
+
     function connect() {
       var ws = new WebSocket("ws://192.168.1.146:8081")
 
@@ -32,37 +88,14 @@
         // split to next one
         data = data.substring(data.indexOf(':') + 1)
         var from_image_num = data.substring(0, data.indexOf(':'))
+        data = data.substring(data.indexOf(':') + 1)
         var from_msg = data.substring(data.indexOf(':' + 1))
         var from_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + from_image_num + "-bg.webp"
 
-        // Append the chat message into chat window.
-        var parent = document.getElementById('chat_window')
-        var child = document.createElement('div')
-        if (from_user_id == user_id) {
-          child.innerHTML = `
-              <div class="d-flex flex-row justify-content-end mb-4 pt-1">
-                <div>
-                  <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">${from_msg}</p>
-                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
-                </div>
-                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
-              </div>`
-
-        } else {
-          child.innerHTML = `
-              <div class="d-flex flex-row justify-content-start">
-                <img src="${from_image_url}" alt="avatar 1" style="width: 45px; height: 100%;">
-                <div>
-                  <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">${from_msg}</p>
-                  <p class="small ms-3 mb-3 rounded-3 text-muted"></p>
-                </div>
-              </div>`
-        }
-        parent.appendChild(child)
-
+        appendMessageToChatWindow(from_user_id, from_image_url, from_msg)
         // Scroll down to the bottom to show the latest message on both sides.
-        $(parent).animate({
-          scrollTop: parent.scrollHeight,
+        $(chat_window).animate({
+          scrollTop: chat_window.scrollHeight,
         }, 500);
       }
 

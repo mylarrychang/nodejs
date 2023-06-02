@@ -5,18 +5,20 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th scope="col">Time</th>
-          <th scope="col">Name</th>
-          <th scope="col">Author</th>
+          <th scope="col">Channel Id</th>
+          <th scope="col">Snowflake Id</th>
+          <th scope="col">Author Id</th>
+          <th scope="col">Message</th>
         </tr>
       </thead>
       <tbody>
-        <% var movieList=JSON.parse(movies); %>
-        <% for (var i=0; i < movieList.length ; i++) { %>
+        <% var messageList=JSON.parse(messages); %>
+        <% for (var i=0; i < messageList.length ; i++) { %>
         <tr>
-          <td><%= movieList[i].time %></td>
-          <td><%= movieList[i].name %></td>
-          <td><%= movieList[i].author %></td>
+          <td><%= messageList[i].channel_id %></td>
+          <td><%= messageList[i].snowflake_id %></td>
+          <td><%= messageList[i].author_id %></td>
+          <td><%= messageList[i].message %></td>
         </tr>
         <% } %>
       </tbody>

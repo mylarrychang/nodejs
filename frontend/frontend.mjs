@@ -28,34 +28,57 @@ async function main() {
     const client = new mongodb.MongoClient(uri)
     client.connect()
     console.log("in db connection..." + uri)
-    const collection = client.db('mydatabase').collection('movies');
+    const collection = client.db('chat').collection('messages');
     app.set('view engine', 'ejs');
     app.set('views', __dirname);
     app.use(express.static(__dirname + "/html"))
 
-    var user_id = 0
-    app.get('/', async function (req, res) {
+    app.get('/chat/:uid', async function (req, res) {
         console.log("in get ... ID: " + ID)
+        var user_id = req.params.uid
         var num = user_id % 5 + 1
         var self_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + num + "-bg.webp"
+
+        var messages = []
+        const query = {}
+        const array = collection.find(query)
+        .sort({ snowflake_id: -1 }).limit(20)
+        for await (const doc of array) {
+            // list of documents
+            messages.push({
+                channel_id: doc.channel_id,
+                snowflake_id: doc.snowflake_id,
+                author_id: doc.author_id,
+                message: doc.message
+            })
+        }
+
+        // encode messages into JSON to avoid token injection.
+        const encoded_messages = Buffer.from(JSON.stringify(messages), 'utf8').toString('base64')  
         res.render(path.resolve("html/chat"), {
+            messages: encoded_messages,
             self_image_url: self_image_url,
             image_num: num,
-            user_id: user_id++
+            user_id: user_id
         })
     })
 
     app.get('/list', async function (req, res) {
         console.log("in lists request... ID: " + ID)
-        var movies = []
+        var messages = []
         const query = {}
-        const array = collection.find(query)
+        const array = collection.find(query).sort({ snowflake_id: -1 }).limit(3)
         for await (const doc of array) {
             // list of documents
             console.log(doc)
-            movies.push({ time: doc.time, name: doc.name, author: doc.author })
+            messages.push({
+                channel_id: doc.channel_id,
+                snowflake_id: doc.snowflake_id,
+                author_id: doc.author_id,
+                message: doc.message
+            })
         }
-        res.render(path.resolve("html/list"), { movies: JSON.stringify(movies) })
+        res.render(path.resolve("html/list"), { messages: JSON.stringify(messages) })
     })
 
     app.get('/list/:author', async function (req, res) {
