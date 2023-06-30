@@ -1,0 +1,19 @@
+<%- include('common/head.ejs') %>
+
+<body>
+  <div>
+    Current User: <%= user_id %>
+  </div>
+  <div class="jumbotron">
+    <form action="/v1/news" method="post">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Message</span>
+        </div>
+        <input type="text" name="message" class="form-control" aria-describedby="basic-addon1">
+        <input type="hidden" name="author_id" value="<%= user_id %>">
+      </div>
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+  </div>
+</body>

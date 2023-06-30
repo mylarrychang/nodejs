@@ -1,7 +1,6 @@
 <%- include('common/head.ejs') %>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-
 <script>
   function b64DecodeUnicode(str) {
     // Going backwards: from bytestream, to percent-encoding, to original string.
@@ -12,9 +11,9 @@
 
   // connect to socket server.
   var user_id = "<%= user_id %>"
-  var image_num = "<%= image_num %>"
-  var image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + image_num + "-bg.webp"
   var msg = "<%- messages %>"
+  var image_num = user_id % 5 + 1
+  var image_url = "/img/ava" + image_num + "-bg.webp"
   const decoded_msg = b64DecodeUnicode(msg)
   var messageList = JSON.parse(decoded_msg)
 
@@ -22,7 +21,6 @@
     var chat_window = document.getElementById('chat_window')
 
     function appendMessageToChatWindow(from_user_id, from_image_url, from_msg) {
-      console.log("from_user_id: " + from_user_id)
       // Append the chat message into chat window.
       var parent = document.getElementById('chat_window')
       var child = document.createElement('div')
@@ -52,7 +50,7 @@
     // load history messages
     for (var i = messageList.length - 1; i >= 0; i--) {
       var index = messageList[i].author_id % 5 + 1
-      var img_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + index + "-bg.webp"
+      var img_url = "/img/ava" + index + "-bg.webp"
       appendMessageToChatWindow(
         messageList[i].author_id,
         img_url,
@@ -85,12 +83,10 @@
         console.log(`received: ${message.data}`)
         var data = message.data
         var from_user_id = data.substring(0, data.indexOf(':'))
-        // split to next one
-        data = data.substring(data.indexOf(':') + 1)
-        var from_image_num = data.substring(0, data.indexOf(':'))
+        var from_image_num = from_user_id % 5 + 1
         data = data.substring(data.indexOf(':') + 1)
         var from_msg = data.substring(data.indexOf(':' + 1))
-        var from_image_url = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava" + from_image_num + "-bg.webp"
+        var from_image_url = "/img/ava" + from_image_num + "-bg.webp"
 
         appendMessageToChatWindow(from_user_id, from_image_url, from_msg)
         // Scroll down to the bottom to show the latest message on both sides.
@@ -122,7 +118,7 @@
       function sendMsg(msg) {
         if (!msg) return
         try {
-          ws.send(`${user_id}:${image_num}:${msg}`)
+          ws.send(`${user_id}:${msg}`)
         } catch (e) {
           console.log("error.. " + e)
         }
@@ -148,7 +144,7 @@
             <div id="chat_window" class="card-body overflow-auto" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
             </div>
             <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
-              <img src="<%= self_image_url %>" alt="avatar 3" style="width: 40px; height: 100%;">
+              <img src="<%= "/img/ava" + (user_id % 5 + 1) + "-bg.webp" %>" alt="avatar 3" style="width: 40px; height: 100%;">
               <input type="text" class="form-control form-control-lg" id="msg" placeholder="Type message">
               <a class="ms-1 text-muted" href="#!"><i class="fas fa-paperclip"></i></a>
               <a class="ms-3 text-muted" href="#!"><i class="fas fa-smile"></i></a>

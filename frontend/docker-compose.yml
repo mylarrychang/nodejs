@@ -2,7 +2,7 @@ version: "3"
 services :
   mongo:
     image: "mongo"
-    container_name: "mongo"
+    container_name: "mongo_frontend"
     volumes:
       - dbdata:/data/db
     networks:

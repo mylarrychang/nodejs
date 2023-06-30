@@ -18,7 +18,7 @@ services :
     networks:
       - node_network
 
-  # Used for pub-sub
+  # Used by chat pub-sub
   rds:
     image: "redis"
     networks:
@@ -59,7 +59,8 @@ services :
     networks:
       - node_network
 
-  # Document db to store messages
+  # Document db to store chat messages
+  # <TODO> move to Cassandra
   mongo:
     image: "mongo"
     volumes:
@@ -69,7 +70,7 @@ services :
     expose:
       - 27017
 
-  # Http clients.
+  # Frontend clients serving REST API and UI.
   frontend1:
     build:
       context: ./frontend
@@ -83,6 +84,8 @@ services :
       - node_network
     links:
       - mongo
+    # waiting for server to start...
+    # command: sh -c '/bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run frontend'
 
   frontend2:
     build:
@@ -97,6 +100,8 @@ services :
       - node_network
     links:
       - mongo
+    # waiting for rabbitmq to start...
+    # command: sh -c '/bin/wait-for-it.sh rabbitmq:5672 --timeout=30 -- npm run frontend'
 
 volumes:
   dbdata:

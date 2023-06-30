@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:16 as base
 WORKDIR /home/node/frontend
 COPY package.json /home/node/frontend
 COPY package-lock.json /home/node/frontend
@@ -8,3 +8,7 @@ COPY node_modules /home/node/frontend/node_modules
 EXPOSE 8080
 RUN npm install
 CMD npm run frontend
+
+FROM base as dev
+RUN wget -O /bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+RUN chmod +x /bin/wait-for-it.sh

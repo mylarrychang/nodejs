@@ -1,0 +1,38 @@
+<%- include('common/head.ejs') %>
+
+<body>
+  <div class="jumbotron">
+    <form action="/v1/follow" method="post">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Follower</span>
+        </div>
+        <input type="text" name="follower" class="form-control" placeholder="follower" aria-describedby="basic-addon1">
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1">Followee</span>
+        </div>
+        <input type="text" name="followee" class="form-control" placeholder="followee" aria-describedby="basic-addon1">
+      </div>
+      <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Follower</th>
+          <th scope="col">Followee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% var followList=JSON.parse(follows); %>
+        <% for (var i=0; i < followList.length ; i++) { %>
+        <tr>
+          <td><%= followList[i].follower %></td>
+          <td><%= followList[i].followee %></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>

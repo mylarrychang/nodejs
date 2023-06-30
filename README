@@ -2,3 +2,10 @@
 docker compose up --build
 # Timeline
 * May 31, 2023: refactor codes
+
+
+Call Follow API
+
+```
+curl -X POST http://localhost:8080/v1/follow   -H "Content-Type: application/json"  -d '{"follower": "123", "followee": "124"}'  
+```
